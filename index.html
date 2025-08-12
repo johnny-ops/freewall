@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="John Lawrence J. Cano">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="fart.jpg" type="image/x-icon">
     <title>OWWW-THOUGHTS</title>
@@ -133,98 +134,7 @@
             animation: spin 1s linear infinite;
         }
 
-        .wall {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
 
-        .post {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .post:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .post::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #044721, #2d5a41, #5a8a6b);
-            background-size: 200% 100%;
-            animation: gradientShift 3s ease infinite;
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e1e5e9;
-        }
-
-        .post-author {
-            font-weight: 600;
-            color: #044721;
-            font-size: 1rem;
-        }
-
-        .post-time {
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        .post-content {
-            line-height: 1.6;
-            color: #444;
-            font-size: 1rem;
-        }
-
-        .post-actions {
-            margin-top: 1rem;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .like-btn, .reply-btn {
-            background: none;
-            border: 1px solid #e1e5e9;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .like-btn:hover, .reply-btn:hover {
-            background: #044721;
-            color: white;
-            border-color: #044721;
-        }
-
-        .like-btn.liked {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c;
-        }
 
         .stats {
             display: flex;
@@ -547,10 +457,6 @@
                 font-size: 2.5rem;
             }
 
-            .wall {
-                grid-template-columns: 1fr;
-            }
-
             .stats {
                 flex-direction: column;
                 gap: 1rem;
@@ -637,28 +543,23 @@
             </div>
         </div>
 
-        <div class="wall" id="wall">
-            <!-- Posts will be generated here -->
-        </div>
-    </div>
 
-    <!-- Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
 
     <script>
-        // Firebase Configuration
-      const firebaseConfig = {
-        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-        measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-        };
         
-        // Global variables
+   const firebaseConfig = {
+    apiKey: "AIzaSyDvCfNRLP_fsbF3xledq5oqC0gTkPlYxp0", // Client-safe to expose
+    authDomain: "freewall-fbd32.firebaseapp.com",
+    projectId: "freewall-fbd32", 
+    storageBucket: "freewall-fbd32.firebasestorage.app",
+    messagingSenderId: "525601854815",
+    appId: "1:525601854815:web:521c43232bee3e3d63d2ea",
+    measurementId: "G-CNESJG3SQM"
+};
+        
+    
         let db, postsRef;
         let posts = [];
         let totalLikes = 0;
@@ -670,7 +571,7 @@
         const MAX_RETRIES = 3;
         let replyStates = new Map();
 
-        // Notification System
+        
         function showNotification(type, title, message, duration = 5000) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -703,6 +604,51 @@
 
             return notification;
         }
+
+        // Add this function to your JavaScript code
+function toggleLike(postId) {
+    if (!db || !postsRef) {
+        showNotification('error', 'Database Error', 'Database connection not available.');
+        return;
+    }
+
+    const postRef = postsRef.doc(postId);
+    
+    // Use a transaction to safely update likes
+    db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(postRef);
+        if (!doc.exists) {
+            throw new Error("Post does not exist!");
+        }
+
+        const currentLikes = doc.data().likes || 0;
+        const isLiked = userLikes.has(postId);
+        const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+
+        // Update the post
+        transaction.update(postRef, { likes: Math.max(0, newLikes) });
+
+        // Update local state
+        if (isLiked) {
+            userLikes.delete(postId);
+        } else {
+            userLikes.add(postId);
+        }
+
+        return newLikes;
+    }).then((newLikes) => {
+        // Update UI immediately for better UX
+        const likeBtn = document.querySelector(`button[onclick="toggleLike('${postId}')"]`);
+        if (likeBtn) {
+            const isLiked = userLikes.has(postId);
+            likeBtn.innerHTML = `${isLiked ? '❤️' : '🤍'} ${newLikes}`;
+            likeBtn.classList.toggle('liked', isLiked);
+        }
+    }).catch((error) => {
+        console.error("Transaction failed: ", error);
+        showNotification('error', 'Like Failed', 'Unable to update like. Please try again.');
+    });
+}
 
         function hideNotification(notification) {
             notification.classList.remove('show');
@@ -948,62 +894,15 @@
                     totalLikes += post.likes || 0;
                 });
                 
-                renderPosts();
                 updateStats();
                 
             }, (error) => {
                 console.error('Error listening to posts:', error);
-                handleFirestoreError(error);
+                handleFirebaseError(error);
             });
         }
 
-        // Enhanced like functionality with error handling
-        function toggleLike(postId) {
-            if (!isOnline) {
-                showNotification('warning', 'Offline', 'Cannot like posts while offline.');
-                return;
-            }
 
-            if (!db) {
-                showNotification('error', 'Database Error', 'Database connection not available.');
-                return;
-            }
-
-            const postRef = db.collection('posts').doc(postId);
-            const isCurrentlyLiked = userLikes.has(postId);
-            
-            // Store for retry
-            lastAction = () => toggleLike(postId);
-            
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (doc.exists) {
-                    const post = doc.data();
-                    const newLikes = isCurrentlyLiked ? 
-                        Math.max(0, (post.likes || 0) - 1) : 
-                        (post.likes || 0) + 1;
-                    
-                    transaction.update(postRef, { likes: newLikes });
-                    
-                    // Update local user likes tracking
-                    if (isCurrentlyLiked) {
-                        userLikes.delete(postId);
-                    } else {
-                        userLikes.add(postId);
-                    }
-                }
-            }).catch((error) => {
-                console.error('Error updating likes:', error);
-                
-                if (error.code === 'permission-denied') {
-                    showNotification('error', 'Permission Denied', 'You don\'t have permission to like posts.');
-                } else if (error.code === 'unavailable' || error.message.includes('network')) {
-                    showNotification('error', 'Connection Error', 'Failed to update like. Please try again.');
-                } else {
-                    showNotification('error', 'Like Failed', 'Unable to update like. Please try again.');
-                }
-            });
-        }
 
         function updateStats() {
             document.getElementById('totalPosts').textContent = posts.length;
@@ -1245,643 +1144,7 @@
             }
         `;
         document.head.appendChild(rippleStyle);
-        function addReply(postId, author, content) {
-    if (!isOnline) {
-        showNotification('warning', 'Offline', 'Cannot reply while offline. Please check your connection.');
-        return Promise.reject(new Error('Offline'));
-    }
 
-    if (!db || !postsRef) {
-        showNotification('error', 'Database Error', 'Database connection not available.');
-        return Promise.reject(new Error('Database not initialized'));
-    }
-
-    if (!content.trim()) {
-        showNotification('warning', 'Empty Reply', 'Please write something before replying.');
-        return Promise.reject(new Error('Empty content'));
-    }
-
-    const replyData = {
-        author: author || 'Anonymous',
-        content: content.trim(),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAt: new Date().toISOString(),
-        postId: postId
-    };
-
-    // Store for retry
-    lastAction = () => addReply(postId, author, content);
-
-    // Add reply to the replies subcollection
-    return postsRef.doc(postId).collection('replies').add(replyData)
-        .then((docRef) => {
-            showNotification('success', 'Reply Added!', 'Your reply has been posted.');
-            retryCount = 0;
-            
-            // Close reply form
-            hideReplyForm(postId);
-            
-            return docRef;
-        })
-        .catch((error) => {
-            console.error('Error adding reply:', error);
-            
-            if (error.code === 'permission-denied') {
-                showNotification('error', 'Permission Denied', 'You don\'t have permission to reply to posts.');
-            } else if (error.code === 'unavailable' || error.message.includes('network')) {
-                showNotification('error', 'Connection Error', 'Failed to post reply. Click retry to try again.');
-                showErrorModal('Connection Error', 'Unable to post your reply due to network issues.', error.message, true);
-            } else {
-                showNotification('error', 'Reply Failed', 'Unable to post your reply. Please try again.');
-                showErrorModal('Reply Error', 'Something went wrong while posting your reply.', error.message, true);
-            }
-            
-            throw error;
-        });
-}
-
-// Show reply form for a specific post
-function showReplyForm(postId) {
-    // Hide other open reply forms
-    document.querySelectorAll('.reply-form').forEach(form => {
-        if (form.dataset.postId !== postId) {
-            form.remove();
-        }
-    });
-
-    // Check if reply form already exists for this post
-    const existingForm = document.querySelector(`.reply-form[data-post-id="${postId}"]`);
-    if (existingForm) {
-        existingForm.remove();
-        return;
-    }
-
-    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-    if (!postElement) return;
-
-    const replyForm = document.createElement('div');
-    replyForm.className = 'reply-form';
-    replyForm.dataset.postId = postId;
-    
-    replyForm.innerHTML = `
-        <div class="reply-form-content">
-            <div class="reply-form-header">
-                <span>Reply to this post</span>
-                <button class="close-reply-btn" onclick="hideReplyForm('${postId}')">&times;</button>
-            </div>
-            <div class="reply-form-body">
-                <input type="text" class="reply-author" placeholder="Your name (optional)" maxlength="50">
-                <textarea class="reply-content" placeholder="Write your reply..." maxlength="500" required></textarea>
-                <div class="reply-form-actions">
-                    <button class="cancel-reply-btn" onclick="hideReplyForm('${postId}')">Cancel</button>
-                    <button class="submit-reply-btn" onclick="submitReply('${postId}')">
-                        <span class="reply-btn-text">Reply</span>
-                        <div class="reply-loading-spinner" style="display: none;">⏳</div>
-                    </button>
-                </div>
-                <div class="reply-char-count">
-                    <span class="current-count">0</span>/500
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Insert after the post
-    postElement.insertAdjacentElement('afterend', replyForm);
-    
-    // Focus on the textarea
-    const textarea = replyForm.querySelector('.reply-content');
-    textarea.focus();
-    
-    // Add character counter
-    textarea.addEventListener('input', function() {
-        const currentLength = this.value.length;
-        const counter = replyForm.querySelector('.current-count');
-        counter.textContent = currentLength;
-        
-        if (currentLength > 450) {
-            counter.style.color = '#e74c3c';
-        } else {
-            counter.style.color = '#rgba(255,255,255,0.7)';
-        }
-    });
-
-    // Add enter key handler (Ctrl+Enter to submit)
-    textarea.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.key === 'Enter') {
-            submitReply(postId);
-        }
-    });
-
-    // Animation
-    setTimeout(() => {
-        replyForm.style.opacity = '1';
-        replyForm.style.transform = 'translateY(0)';
-    }, 10);
-}
-
-// Hide reply form
-function hideReplyForm(postId) {
-    const replyForm = document.querySelector(`.reply-form[data-post-id="${postId}"]`);
-    if (replyForm) {
-        replyForm.style.opacity = '0';
-        replyForm.style.transform = 'translateY(-10px)';
-        setTimeout(() => {
-            replyForm.remove();
-        }, 300);
-    }
-}
-
-// Submit reply
-async function submitReply(postId) {
-    const replyForm = document.querySelector(`.reply-form[data-post-id="${postId}"]`);
-    if (!replyForm) return;
-
-    const authorInput = replyForm.querySelector('.reply-author');
-    const contentTextarea = replyForm.querySelector('.reply-content');
-    const submitBtn = replyForm.querySelector('.submit-reply-btn');
-    const btnText = replyForm.querySelector('.reply-btn-text');
-    const spinner = replyForm.querySelector('.reply-loading-spinner');
-
-    const author = authorInput.value.trim();
-    const content = contentTextarea.value.trim();
-
-    if (!content) {
-        showNotification('warning', 'Empty Reply', 'Please write something before replying.');
-        contentTextarea.focus();
-        return;
-    }
-
-    if (content.length > 500) {
-        showNotification('warning', 'Reply Too Long', 'Please keep your reply under 500 characters.');
-        return;
-    }
-
-    // Show loading state
-    submitBtn.disabled = true;
-    btnText.style.display = 'none';
-    spinner.style.display = 'inline-block';
-
-    try {
-        await addReply(postId, author, content);
-        
-        // Success animation
-        btnText.textContent = '✓ Replied!';
-        submitBtn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
-        
-        setTimeout(() => {
-            hideReplyForm(postId);
-        }, 1000);
-        
-    } catch (error) {
-        // Error handled in addReply function
-        btnText.textContent = 'Reply';
-    } finally {
-        // Reset button state
-        submitBtn.disabled = false;
-        btnText.style.display = 'inline-block';
-        spinner.style.display = 'none';
-    }
-}
-
-// Load replies for a post
-function loadReplies(postId) {
-    if (!db || !postsRef) return Promise.resolve([]);
-
-    return postsRef.doc(postId).collection('replies')
-        .orderBy('timestamp', 'asc')
-        .get()
-        .then(snapshot => {
-            const replies = [];
-            snapshot.forEach(doc => {
-                replies.push({ id: doc.id, ...doc.data() });
-            });
-            return replies;
-        })
-        .catch(error => {
-            console.error('Error loading replies:', error);
-            return [];
-        });
-}
-
-// Toggle replies visibility
-async function toggleReplies(postId) {
-    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-    if (!postElement) return;
-
-    const repliesContainer = postElement.querySelector('.replies-container');
-    
-    if (repliesContainer && repliesContainer.style.display !== 'none') {
-        // Hide replies
-        repliesContainer.style.display = 'none';
-        const toggleBtn = postElement.querySelector('.toggle-replies-btn');
-        if (toggleBtn) {
-            toggleBtn.textContent = 'Show Replies';
-        }
-        return;
-    }
-
-    // Show loading
-    const replyBtn = postElement.querySelector('.reply-btn');
-    const originalText = replyBtn.textContent;
-    replyBtn.textContent = '⏳ Loading...';
-    replyBtn.disabled = true;
-
-    try {
-        const replies = await loadReplies(postId);
-        displayReplies(postId, replies);
-    } catch (error) {
-        showNotification('error', 'Load Failed', 'Unable to load replies.');
-    } finally {
-        replyBtn.textContent = originalText;
-        replyBtn.disabled = false;
-    }
-}
-
-// Display replies in the UI
-function displayReplies(postId, replies) {
-    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-    if (!postElement) return;
-
-    let repliesContainer = postElement.querySelector('.replies-container');
-    
-    if (!repliesContainer) {
-        repliesContainer = document.createElement('div');
-        repliesContainer.className = 'replies-container';
-        postElement.appendChild(repliesContainer);
-    }
-
-    repliesContainer.innerHTML = '';
-
-    if (replies.length === 0) {
-        repliesContainer.innerHTML = `
-            <div class="no-replies">
-                <p>No replies yet. Be the first to reply!</p>
-            </div>
-        `;
-    } else {
-        const repliesHTML = replies.map(reply => `
-            <div class="reply-item">
-                <div class="reply-header">
-                    <span class="reply-author">${reply.author || 'Anonymous'}</span>
-                    <span class="reply-time">${formatTime(reply.timestamp)}</span>
-                </div>
-                <div class="reply-content">${escapeHtml(reply.content)}</div>
-            </div>
-        `).join('');
-
-        repliesContainer.innerHTML = `
-            <div class="replies-header">
-                <span class="replies-count">${replies.length} ${replies.length === 1 ? 'Reply' : 'Replies'}</span>
-                <button class="toggle-replies-btn" onclick="toggleReplies('${postId}')">Hide Replies</button>
-            </div>
-            <div class="replies-list">
-                ${repliesHTML}
-            </div>
-        `;
-    }
-
-    repliesContainer.style.display = 'block';
-    
-    // Scroll to replies
-    repliesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// Enhanced createPostElement function to include reply functionality
-function createPostElementWithReplies(post, index) {
-    const postDiv = document.createElement('div');
-    postDiv.className = 'post';
-    postDiv.style.animationDelay = `${index * 0.1}s`;
-    postDiv.dataset.postId = post.id;
-    
-    const isLiked = userLikes.has(post.id);
-    
-    postDiv.innerHTML = `
-        <div class="post-header">
-            <span class="post-author">${post.author || 'Anonymous'}</span>
-            <span class="post-time">${formatTime(post.timestamp)}</span>
-        </div>
-        <div class="post-content">${escapeHtml(post.content)}</div>
-        <div class="post-actions">
-            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
-                ${isLiked ? '❤️' : '🤍'} ${post.likes || 0}
-            </button>
-            <button class="reply-btn" onclick="showReplyForm('${post.id}')">💬 Reply</button>
-            <button class="view-replies-btn" onclick="toggleReplies('${post.id}')">👁️ View Replies</button>
-        </div>
-    `;
-    
-    return postDiv;
-}
-
-// Update the renderPosts function to use the new createPostElement
-function renderPostsWithReplies() {
-    const wall = document.getElementById('wall');
-    wall.innerHTML = '';
-    
-    if (posts.length === 0) {
-        wall.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.7);">
-                <h3>No posts yet!</h3>
-                <p>Be the first to share your voice on the Freedom Wall.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    posts.forEach((post, index) => {
-        wall.appendChild(createPostElementWithReplies(post, index));
-    });
-
-    // Trigger animation
-    setTimeout(() => {
-        document.querySelectorAll('.post').forEach(post => {
-            post.style.opacity = '1';
-            post.style.transform = 'translateY(0)';
-        });
-    }, 100);
-}
-
-// Add CSS styles for reply functionality
-const replyStyles = document.createElement('style');
-replyStyles.textContent = `
-    .reply-form {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        margin: 10px 0;
-        padding: 20px;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .reply-form-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-    }
-
-    .close-reply-btn {
-        background: none;
-        border: none;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 24px;
-        cursor: pointer;
-        padding: 0;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-    .close-reply-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 1);
-    }
-
-    .reply-author {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        margin-bottom: 10px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .reply-author:focus {
-        outline: none;
-        border-color: rgba(255, 255, 255, 0.5);
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .reply-content {
-        width: 100%;
-        min-height: 80px;
-        padding: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        color: #044721;
-        resize: vertical;
-        font-family: inherit;
-        font-size: 14px;
-        line-height: 1.5;
-        transition: all 0.3s ease;
-    }
-
-    .reply-content:focus {
-        outline: none;
-        border-color: rgba(255, 255, 255, 0.5);
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .reply-form-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-        justify-content: flex-end;
-    }
-
-    .cancel-reply-btn {
-        padding: 10px 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.8);
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .cancel-reply-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-
-    .submit-reply-btn {
-        padding: 10px 20px;
-        background: linear-gradient(135deg, #044721, #2d5a41);
-        border: none;
-        border-radius: 8px;
-        color: white;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .submit-reply-btn:hover {
-        background: linear-gradient(135deg, #055a29, #3a6b50);
-        transform: translateY(-2px);
-    }
-
-    .submit-reply-btn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .reply-char-count {
-        text-align: right;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.7);
-        margin-top: 5px;
-    }
-
-    .replies-container {
-        margin-top: 15px;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .replies-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .replies-count {
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-    .toggle-replies-btn {
-        background: none;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 6px;
-        color: rgba(255, 255, 255, 0.8);
-        padding: 5px 10px;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .toggle-replies-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-    }
-
-    .reply-item {
-        background:  #044721;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 10px;
-        border-left: 3px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .reply-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .reply-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-
-    .reply-author {
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-        font-size: 13px;
-    }
-
-    .reply-time {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 12px;
-    }
-
-    .reply-content {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 14px;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    .no-replies {
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
-        font-style: italic;
-        padding: 20px;
-    }
-
-    .view-replies-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.8);
-        padding: 8px 12px;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .view-replies-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-
-    .post-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-        align-items: center;
-    }
-
-    @media (max-width: 768px) {
-        .reply-form-actions {
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .cancel-reply-btn, .submit-reply-btn {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .post-actions {
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        
-        .post-actions button {
-            flex: 1;
-            min-width: 0;
-            font-size: 12px;
-        }
-    }
-`;
-
-document.head.appendChild(replyStyles);
-
-function updateRenderPosts() {
-    // Store the original function reference
-    const originalRenderPosts = window.renderPosts;
-    
-    // Replace with the new function
-    window.renderPosts = renderPostsWithReplies;
-}
-
-// Call this to update the render function
-updateRenderPosts();
         // Start the application
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
@@ -1889,43 +1152,26 @@ updateRenderPosts();
             
             // Initial connection status
             updateConnectionStatus(navigator.onLine);
+            
+            // Add typing detection to content textarea
+            const contentTextarea = document.getElementById('postContent');
+            if (contentTextarea) {
+                contentTextarea.addEventListener('input', function() {
+                    // Simple typing detection
+                    const charCount = this.value.length;
+                    if (charCount > 0) {
+                        this.style.borderColor = '#044721';
+                    } else {
+                        this.style.borderColor = '#e1e5e9';
+                    }
+                });
+            }
         });
 
         // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
             if (unsubscribe) {
                 unsubscribe();
-            }
-        });
-
-        // Expose functions for inline event handlers
-         window.deletePost = deletePost;
-        window.reportPost = reportPost;
-        window.searchPosts = searchPosts;
-        window.clearSearch = clearSearch;
-        window.handleImageUpload = handleImageUpload;
-        window.removeImagePreview = removeImagePreview;
-        window.showEmojiPicker = showEmojiPicker;
-        window.toggleAutoRefresh = toggleAutoRefresh;
-        window.handleTypingStart = handleTypingStart;
-        window.showReplyForm = showReplyForm;
-        window.hideReplyForm = hideReplyForm;
-        window.submitReply = submitReply;
-        window.toggleReplies = toggleReplies;
-        window.addReply = addReply;
-
-        // Initialize additional features
-        document.addEventListener('DOMContentLoaded', function() {
-            setupKeyboardShortcuts();
-            startAutoRefresh();
-            
-            // Track page load
-            trackEvent('page_load');
-            
-            // Add typing detection to content textarea
-            const contentTextarea = document.getElementById('postContent');
-            if (contentTextarea) {
-                contentTextarea.addEventListener('input', handleTypingStart);
             }
         });
 </script>

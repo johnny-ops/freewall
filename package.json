@@ -1,0 +1,17 @@
+{
+  "name": "freedom-wall",
+  "version": "1.0.0",
+  "description": "A freedom wall application with Firebase Firestore",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s .",
+    "build": "echo 'No build needed for static HTML'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
