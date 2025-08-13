@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="John Lawrence J. Cano">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="fart.jpg" type="image/x-icon">
+    <title>OWWW-THOUGHTS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #044721 0%, #2d5a41 50%, #1a3d2e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .header p {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+            padding: 0 1rem;
+        }
+
+        .post-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: clamp(1rem, 4vw, 2rem);
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            animation: slideInLeft 0.8s ease;
+        }
+
+        .post-form h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-size: clamp(1.25rem, 5vw, 1.5rem);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: clamp(0.75rem, 3vw, 1rem);
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #044721;
+            box-shadow: 0 0 0 3px rgba(4, 71, 33, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            min-height: clamp(100px, 20vw, 120px);
+            resize: vertical;
+        }
+
+        .post-btn {
+            background: linear-gradient(135deg, #044721, #2d5a41);
+            color: white;
+            border: none;
+            padding: clamp(0.75rem, 3vw, 1rem) clamp(1.5rem, 5vw, 2rem);
+            border-radius: 12px;
+            font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 48px; /* Minimum touch target size */
+        }
+
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(4, 71, 33, 0.4);
+        }
+
+        .post-btn:active {
+            transform: translateY(0);
+        }
+
+        .post-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 5vw, 3rem);
+            margin: 3rem 0;
+            padding: clamp(1rem, 4vw, 2rem);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            color: white;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-number {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: bold;
+            display: block;
+            color: #5a8a6b;
+            line-height: 1.2;
+        }
+
+        .stat span:last-child {
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            opacity: 0.9;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: min(400px, calc(100vw - 40px));
+            min-width: min(300px, calc(100vw - 40px));
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            color: white;
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .notification-icon {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: clamp(0.9rem, 3.5vw, 1rem);
+        }
+
+        .notification-message {
+            font-size: clamp(0.8rem, 3vw, 0.85rem);
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+            min-width: 32px;
+            min-height: 32px;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: clamp(0.75rem, 3vw, 0.85rem);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.online {
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+        }
+
+        .connection-status.offline {
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        /* Error Modal */
+        .error-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .error-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .error-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: clamp(1.5rem, 5vw, 2rem);
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .error-modal.show .error-modal-content {
+            transform: scale(1);
+        }
+
+        .error-modal h3 {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: clamp(1.1rem, 4vw, 1.25rem);
+        }
+
+        .error-modal p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: clamp(0.9rem, 3.5vw, 1rem);
+        }
+
+        .error-modal pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: clamp(0.75rem, 3vw, 0.85rem);
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .error-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .error-modal-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            min-height: 44px;
+        }
+
+        .error-modal-button.primary {
+            background: #044721;
+            color: white;
+        }
+
+        .error-modal-button.secondary {
+            background: #e1e5e9;
+            color: #666;
+        }
+
+        .error-modal-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Enhanced Mobile Breakpoints */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                transform: translateY(-100%);
+                top: 10px;
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+
+            .connection-status {
+                bottom: 10px;
+                left: 10px;
+            }
+
+            .floating-shapes .shape {
+                transform: scale(0.7);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.75rem;
+            }
+
+            .header {
+                margin-bottom: 2rem;
+            }
+
+            .post-form {
+                border-radius: 16px;
+                margin-bottom: 2rem;
+            }
+
+            .stats {
+                margin: 2rem 0;
+                border-radius: 16px;
+            }
+
+            .error-modal-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .error-modal-button {
+                width: 100%;
+            }
+
+            .floating-shapes .shape {
+                transform: scale(0.5);
+                opacity: 0.05;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .post-form {
+                padding: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .stats {
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+        }
+
+        /* Landscape phone orientation */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                margin-bottom: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .stats {
+                margin: 1.5rem 0;
+                flex-direction: row;
+            }
+
+            .floating-shapes .shape {
+                display: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .post-form,
+            .stats,
+            .notification {
+                backdrop-filter: blur(15px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape" style="width: 100px; height: 100px; background: linear-gradient(45deg, #044721, #2d5a41); border-radius: 50%;"></div>
+        <div class="shape" style="width: 80px; height: 80px; background: linear-gradient(45deg, #5a8a6b, #76a582); border-radius: 20px;"></div>
+        <div class="shape" style="width: 120px; height: 120px; background: linear-gradient(45deg, #044721, #3e7455); clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+    </div>
+
+    <!-- Connection Status -->
+    <div class="connection-status online" id="connectionStatus">
+        <div class="connection-dot"></div>
+        <span>Connected</span>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="error-modal" id="errorModal">
+        <div class="error-modal-content">
+            <h3 id="errorTitle">🚫 Error</h3>
+            <p id="errorMessage">Something went wrong. Please try again.</p>
+            <div id="errorDetails" style="display: none;">
+                <h4>Technical Details:</h4>
+                <pre id="errorCode"></pre>
+            </div>
+            <div class="error-modal-buttons">
+                <button class="error-modal-button secondary" onclick="hideErrorModal()">Cancel</button>
+                <button class="error-modal-button primary" id="errorRetryBtn" onclick="retryLastAction()">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>Freedom Wall</h1>
+            <p>Share your thoughts, dreams, and voice with the world. Every message matters.</p>
+        </header>
+
+        <div class="post-form">
+            <h2>Share Your Voice</h2>
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="authorName">Your Name (or stay anonymous)</label>
+                    <input type="text" id="authorName" placeholder="Enter your name or leave blank for anonymous">
+                </div>
+                <div class="form-group">
+                    <label for="postContent">Your Message</label>
+                    <textarea id="postContent" placeholder="What's on your mind? Share your thoughts, feelings, dreams, or anything you want to express..." required></textarea>
+                </div>
+                <button type="submit" class="post-btn" id="postBtn">
+                    <span id="postBtnText">Post to Wall</span>
+                    <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                </button>
+            </form>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-number" id="totalPosts">0</span>
+                <span>Total Posts</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" id="totalLikes">0</span>
+                <span>Hearts Given</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" id="activUsers">1</span>
+                <span>Active Voices</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+    <script>
+        
+   const firebaseConfig = {
+    apiKey: "AIzaSyDvCfNRLP_fsbF3xledq5oqC0gTkPlYxp0", // Client-safe to expose
+    authDomain: "freewall-fbd32.firebaseapp.com",
+    projectId: "freewall-fbd32", 
+    storageBucket: "freewall-fbd32.firebasestorage.app",
+    messagingSenderId: "525601854815",
+    appId: "1:525601854815:web:521c43232bee3e3d63d2ea",
+    measurementId: "G-CNESJG3SQM"
+};
+        
+    
+        let db, postsRef;
+        let posts = [];
+        let totalLikes = 0;
+        let userLikes = new Set();
+        let unsubscribe = null;
+        let isOnline = navigator.onLine;
+        let lastAction = null;
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
+        let replyStates = new Map();
+
+        
+        function showNotification(type, title, message, duration = 5000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+
+            notification.innerHTML = `
+                <div class="notification-icon">${icons[type]}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="hideNotification(this.parentElement)">×</button>
+            `;
+
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto hide
+            if (duration > 0) {
+                setTimeout(() => hideNotification(notification), duration);
+            }
+
+            return notification;
+        }
+
+        // Add this function to your JavaScript code
+function toggleLike(postId) {
+    if (!db || !postsRef) {
+        showNotification('error', 'Database Error', 'Database connection not available.');
+        return;
+    }
+
+    const postRef = postsRef.doc(postId);
+    
+    // Use a transaction to safely update likes
+    db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(postRef);
+        if (!doc.exists) {
+            throw new Error("Post does not exist!");
+        }
+
+        const currentLikes = doc.data().likes || 0;
+        const isLiked = userLikes.has(postId);
+        const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+
+        // Update the post
+        transaction.update(postRef, { likes: Math.max(0, newLikes) });
+
+        // Update local state
+        if (isLiked) {
+            userLikes.delete(postId);
+        } else {
+            userLikes.add(postId);
+        }
+
+        return newLikes;
+    }).then((newLikes) => {
+        // Update UI immediately for better UX
+        const likeBtn = document.querySelector(`button[onclick="toggleLike('${postId}')"]`);
+        if (likeBtn) {
+            const isLiked = userLikes.has(postId);
+            likeBtn.innerHTML = `${isLiked ? '❤️' : '🤍'} ${newLikes}`;
+            likeBtn.classList.toggle('liked', isLiked);
+        }
+    }).catch((error) => {
+        console.error("Transaction failed: ", error);
+        showNotification('error', 'Like Failed', 'Unable to update like. Please try again.');
+    });
+}
+
+        function hideNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.parentElement.removeChild(notification);
+                }
+            }, 300);
+        }
+
+        // Error Modal System
+        function showErrorModal(title, message, details = null, showRetry = true) {
+            const modal = document.getElementById('errorModal');
+            const titleEl = document.getElementById('errorTitle');
+            const messageEl = document.getElementById('errorMessage');
+            const detailsEl = document.getElementById('errorDetails');
+            const codeEl = document.getElementById('errorCode');
+            const retryBtn = document.getElementById('errorRetryBtn');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            if (details) {
+                detailsEl.style.display = 'block';
+                codeEl.textContent = details;
+            } else {
+                detailsEl.style.display = 'none';
+            }
+
+            retryBtn.style.display = showRetry ? 'block' : 'none';
+            modal.classList.add('show');
+        }
+
+        function hideErrorModal() {
+            document.getElementById('errorModal').classList.remove('show');
+        }
+
+        function retryLastAction() {
+            hideErrorModal();
+            if (lastAction && retryCount < MAX_RETRIES) {
+                retryCount++;
+                showNotification('info', 'Retrying...', `Attempt ${retryCount} of ${MAX_RETRIES}`);
+                lastAction();
+            } else {
+                showNotification('error', 'Max Retries Reached', 'Please check your connection and try again later.');
+                retryCount = 0;
+            }
+        }
+
+        // Connection Status
+        function updateConnectionStatus(online) {
+            isOnline = online;
+            const statusEl = document.getElementById('connectionStatus');
+            const statusText = statusEl.querySelector('span');
+            
+            if (online) {
+                statusEl.className = 'connection-status online';
+                statusText.textContent = 'Connected';
+            } else {
+                statusEl.className = 'connection-status offline';
+                statusText.textContent = 'Offline';
+                showNotification('warning', 'Connection Lost', 'You\'re currently offline. Posts will be saved when connection is restored.');
+            }
+        }
+
+        // Network event listeners
+        window.addEventListener('online', () => {
+            updateConnectionStatus(true);
+            showNotification('success', 'Back Online', 'Connection restored!');
+            if (unsubscribe) setupFirestoreListeners();
+        });
+
+        window.addEventListener('offline', () => {
+            updateConnectionStatus(false);
+        });
+
+        // Initialize Firebase with error handling
+        function initializeFirebase() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                postsRef = db.collection('posts');
+                
+                // Test connection
+                return postsRef.limit(1).get().then(() => {
+                    showNotification('success', 'Connected!', 'Firebase connection established successfully.');
+                    setupFirestoreListeners();
+                }).catch(error => {
+                    throw error;
+                });
+            } catch (error) {
+                handleFirebaseError(error);
+                return Promise.reject(error);
+            }
+        }
+
+        function handleFirebaseError(error) {
+            console.error('Firebase Error:', error);
+            
+            let title = 'Firebase Error';
+            let message = 'Unable to connect to the database.';
+            let details = null;
+            
+            if (error.code === 'permission-denied') {
+                title = 'Access Denied';
+                message = 'Database security rules are blocking access. Please contact the administrator.';
+                details = `Error Code: ${error.code}\nMessage: ${error.message}`;
+                
+                showErrorModal(title, message, details, false);
+            } else if (error.code === 'unavailable') {
+                title = 'Service Unavailable';
+                message = 'The database service is temporarily unavailable. Please try again later.';
+                lastAction = initializeFirebase;
+                showErrorModal(title, message, error.message, true);
+            } else if (error.message.includes('network')) {
+                title = 'Network Error';
+                message = 'Please check your internet connection and try again.';
+                lastAction = initializeFirebase;
+                showErrorModal(title, message, error.message, true);
+            } else {
+                details = `Error Code: ${error.code || 'Unknown'}\nMessage: ${error.message}`;
+                showErrorModal(title, message, details, true);
+            }
+        }
+
+        // Enhanced post submission with error handling
+        function addPost(author, content) {
+            if (!isOnline) {
+                showNotification('warning', 'Offline', 'Cannot post while offline. Please check your connection.');
+                return Promise.reject(new Error('Offline'));
+            }
+
+            if (!db || !postsRef) {
+                showNotification('error', 'Database Error', 'Database connection not available.');
+                return Promise.reject(new Error('Database not initialized'));
+            }
+
+            const postData = {
+                author: author || 'Anonymous',
+                content: content,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                likes: 0,
+                createdAt: new Date().toISOString()
+            };
+
+            // Store for retry
+            lastAction = () => addPost(author, content);
+
+            return postsRef.add(postData)
+                .then((docRef) => {
+                    showNotification('success', 'Posted!', 'Your message has been shared with the world.');
+                    retryCount = 0; // Reset retry count on success
+                    
+                    // Clear form
+                    document.getElementById('authorName').value = '';
+                    document.getElementById('postContent').value = '';
+                    
+                    return docRef;
+                })
+                .catch((error) => {
+                    console.error('Error adding post:', error);
+                    
+                    if (error.code === 'permission-denied') {
+                        showNotification('error', 'Permission Denied', 'You don\'t have permission to post messages.');
+                    } else if (error.code === 'unavailable' || error.message.includes('network')) {
+                        showNotification('error', 'Connection Error', 'Failed to post. Click retry to try again.');
+                        showErrorModal('Connection Error', 'Unable to post your message due to network issues.', error.message, true);
+                    } else {
+                        showNotification('error', 'Post Failed', 'Unable to post your message. Please try again.');
+                        showErrorModal('Post Error', 'Something went wrong while posting your message.', error.message, true);
+                    }
+                    
+                    throw error;
+                });
+        }
+
+        // Enhanced form submission
+        function setupFormHandling() {
+            const form = document.getElementById('postForm');
+            const btn = document.getElementById('postBtn');
+            const btnText = document.getElementById('postBtnText');
+            const spinner = document.getElementById('loadingSpinner');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const author = document.getElementById('authorName').value.trim();
+                const content = document.getElementById('postContent').value.trim();
+                
+                if (!content) {
+                    showNotification('warning', 'Empty Message', 'Please write something before posting.');
+                    return;
+                }
+
+                if (content.length > 1000) {
+                    showNotification('warning', 'Message Too Long', 'Please keep your message under 1000 characters.');
+                    return;
+                }
+
+                // Show loading state
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                spinner.style.display = 'block';
+
+                try {
+                    await addPost(author, content);
+                    
+                    // Success animation
+                    btnText.textContent = '✓ Posted!';
+                    btn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+                    
+                    setTimeout(() => {
+                        btnText.textContent = 'Post to Wall';
+                        btn.style.background = 'linear-gradient(135deg, #044721, #2d5a41)';
+                    }, 2000);
+                    
+                } catch (error) {
+                    // Error handled in addPost function
+                } finally {
+                    // Reset button state
+                    btn.disabled = false;
+                    btnText.style.display = 'block';
+                    spinner.style.display = 'none';
+                }
+            });
+        }
+
+        // Enhanced Firestore listeners with error handling
+        function setupFirestoreListeners() {
+            if (!postsRef) return;
+
+            if (unsubscribe) {
+                unsubscribe();
+            }
+
+            unsubscribe = postsRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                posts = [];
+                totalLikes = 0;
+                
+                snapshot.forEach((doc) => {
+                    const post = { id: doc.id, ...doc.data() };
+                    posts.push(post);
+                    totalLikes += post.likes || 0;
+                });
+                
+                updateStats();
+                
+            }, (error) => {
+                console.error('Error listening to posts:', error);
+                handleFirebaseError(error);
+            });
+        }
+
+
+
+        function updateStats() {
+            document.getElementById('totalPosts').textContent = posts.length;
+            document.getElementById('totalLikes').textContent = totalLikes;
+            document.getElementById('activUsers').textContent = Math.max(1, Math.floor(posts.length / 3));
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Just now';
+            
+            try {
+                const time = timestamp.toDate ? timestamp.toDate().getTime() : timestamp;
+                const now = Date.now();
+                const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+                
+                if (diffInMinutes < 1) return 'Just now';
+                if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+                if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+                return `${Math.floor(diffInMinutes / 1440)} days ago`;
+            } catch (error) {
+                return 'Just now';
+            }
+        }
+
+        function createPostElement(post, index) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            postDiv.style.animationDelay = `${index * 0.1}s`;
+            
+            const isLiked = userLikes.has(post.id);
+            
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <span class="post-author">${post.author || 'Anonymous'}</span>
+                    <span class="post-time">${formatTime(post.timestamp)}</span>
+                </div>
+                <div class="post-content">${escapeHtml(post.content)}</div>
+                <div class="post-actions">
+                    <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                        ${isLiked ? '❤️' : '🤍'} ${post.likes || 0}
+                    </button>
+                    <button class="reply-btn">💬 Reply</button>
+                </div>
+            `;
+            
+            return postDiv;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderPosts() {
+            const wall = document.getElementById('wall');
+            wall.innerHTML = '';
+            
+            if (posts.length === 0) {
+                wall.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.7);">
+                        <h3>No posts yet!</h3>
+                        <p>Be the first to share your voice on the Freedom Wall.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            posts.forEach((post, index) => {
+                wall.appendChild(createPostElement(post, index));
+            });
+
+            // Trigger animation
+            setTimeout(() => {
+                document.querySelectorAll('.post').forEach(post => {
+                    post.style.opacity = '1';
+                    post.style.transform = 'translateY(0)';
+                });
+            }, 100);
+        }
+
+        // Enhanced error handling for various scenarios
+        function handleGlobalErrors() {
+            // Handle unhandled promise rejections
+            window.addEventListener('unhandledrejection', function(event) {
+                console.error('Unhandled promise rejection:', event.reason);
+                
+                if (event.reason && event.reason.code) {
+                    handleFirebaseError(event.reason);
+                } else {
+                    showNotification('error', 'Unexpected Error', 'Something went wrong. Please refresh the page if issues persist.');
+                }
+                
+                event.preventDefault();
+            });
+
+            // Handle general JavaScript errors
+            window.addEventListener('error', function(event) {
+                console.error('JavaScript error:', event.error);
+                
+                if (event.error && event.error.message && event.error.message.includes('Firebase')) {
+                    handleFirebaseError(event.error);
+                } else if (event.error && event.error.message && event.error.message.includes('network')) {
+                    showNotification('error', 'Network Error', 'Please check your internet connection.');
+                } else {
+                    showNotification('error', 'Script Error', 'A technical error occurred. Please refresh the page.');
+                }
+            });
+
+            // Handle fetch errors (if using fetch API)
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                return originalFetch.apply(this, args).catch(error => {
+                    showNotification('error', 'Network Request Failed', 'Unable to connect to the server.');
+                    throw error;
+                });
+            };
+        }
+
+        // Retry mechanism for failed operations
+        function withRetry(operation, maxRetries = 3, delay = 1000) {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                
+                function attempt() {
+                    attempts++;
+                    operation()
+                        .then(resolve)
+                        .catch(error => {
+                            if (attempts < maxRetries) {
+                                showNotification('warning', 'Retrying...', `Attempt ${attempts + 1} of ${maxRetries}`);
+                                setTimeout(attempt, delay * attempts);
+                            } else {
+                                reject(error);
+                            }
+                        });
+                }
+                
+                attempt();
+            });
+        }
+
+        // Initialize application with comprehensive error handling
+        async function initializeApp() {
+            try {
+                // Show loading notification
+                const loadingNotification = showNotification('info', 'Initializing...', 'Setting up Freedom Wall...', 0);
+                
+                // Set up global error handlers
+                handleGlobalErrors();
+                
+                // Set up form handling
+                setupFormHandling();
+                
+                // Initialize Firebase with retry
+                await withRetry(initializeFirebase, 3, 2000);
+                
+                // Hide loading notification
+                hideNotification(loadingNotification);
+                
+                // Initial stats update
+                updateStats();
+                
+                // Check if there are any issues with the setup
+                setTimeout(() => {
+                    if (posts.length === 0 && isOnline) {
+                        showNotification('info', 'Getting Started', 'Share the first message on this Freedom Wall!');
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                showErrorModal(
+                    '🚫 Initialization Failed', 
+                    'Unable to start Freedom Wall. Please check your internet connection and try refreshing the page.',
+                    error.message,
+                    true
+                );
+                lastAction = initializeApp;
+            }
+        }
+
+        // Enhanced interaction effects
+        function setupInteractiveEffects() {
+            // Add mouse tracking for background shapes
+            document.addEventListener('mousemove', function(e) {
+                const shapes = document.querySelectorAll('.shape');
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                shapes.forEach((shape, index) => {
+                    const speed = (index + 1) * 0.5;
+                    const currentTransform = shape.style.transform || '';
+                    const baseTransform = currentTransform.replace(/translate\([^)]*\)/g, '').trim();
+                    shape.style.transform = `${baseTransform} translate(${x * speed}px, ${y * speed}px)`;
+                });
+            });
+
+            // Add click effects to buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('button')) {
+                    const ripple = document.createElement('div');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.5);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                    
+                    e.target.style.position = 'relative';
+                    e.target.style.overflow = 'hidden';
+                    e.target.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                }
+            });
+        }
+        
+        // Add ripple animation CSS
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+            @keyframes ripple {
+                0% {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(rippleStyle);
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupInteractiveEffects();
+            
+            // Initial connection status
+            updateConnectionStatus(navigator.onLine);
+            
+            // Add typing detection to content textarea
+            const contentTextarea = document.getElementById('postContent');
+            if (contentTextarea) {
+                contentTextarea.addEventListener('input', function() {
+                    // Simple typing detection
+                    const charCount = this.value.length;
+                    if (charCount > 0) {
+                        this.style.borderColor = '#044721';
+                    } else {
+                        this.style.borderColor = '#e1e5e9';
+                    }
+                });
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        });
+</script>
+</body>
+</html>
